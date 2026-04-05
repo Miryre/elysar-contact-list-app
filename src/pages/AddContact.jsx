@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
+import { BASE_URL, AGENDA_SLUG } from "../store";
 
 export const AddContact = () => {
   const { dispatch } = useGlobalReducer();
@@ -11,19 +12,21 @@ export const AddContact = () => {
     email: "",
     phone: "",
     address: "",
-    photo: "https://randomuser.me/api/portraits/lego/1.jpg"
   });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch({
-      type: "add_contact",
-      payload: { ...formData, id: Date.now() }
+    const res = await fetch(`${BASE_URL}/contact/agendas/${AGENDA_SLUG}/contacts`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
     });
+    const newContact = await res.json();
+    dispatch({ type: "add_contact", payload: newContact });
     navigate("/");
   };
 
@@ -34,7 +37,7 @@ export const AddContact = () => {
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label>Full Name</label>
-          <input className="form-control" name="name" placeholder="Full Name" onChange={handleChange} />
+          <input required className="form-control" name="name" placeholder="Full Name" onChange={handleChange} />
         </div>
 
         <div className="mb-3">
@@ -52,7 +55,7 @@ export const AddContact = () => {
           <input className="form-control" name="address" placeholder="Enter address" onChange={handleChange} />
         </div>
 
-        <button type="submit" className="btn btn-primary w-100">save</button>
+        <button type="submit" className="btn btn-primary w-100">Save</button>
       </form>
 
       <Link to="/">or get back to contacts</Link>

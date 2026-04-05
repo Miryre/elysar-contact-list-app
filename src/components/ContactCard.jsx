@@ -2,14 +2,20 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faPhone, faEnvelope, faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
 
-const Contact = ({ contact, onDelete }) => {
-    return(
+const getPortrait = (id) => {
+    const num = (id % 99) + 1;
+    const gender = id % 2 === 0 ? "men" : "women";
+    return `https://randomuser.me/api/portraits/${gender}/${num}.jpg`;
+};
+
+const ContactCard = ({ contact, onDelete }) => {
+    return (
         <div className="d-flex align-items-center p-3" style={{ borderBottom: "1px solid #dee2e6" }}>
 
             <img
-            src={contact.photo}
-            alt={contact.name}
-            style={{ width: "120px", height: "120px", borderRadius: "50%", objectFit: "cover"}}
+                src={contact.photo || getPortrait(contact.id)}
+                alt={contact.name}
+                style={{ width: "120px", height: "120px", borderRadius: "50%", objectFit: "cover" }}
             />
 
             <div className="ms-4 flex-grow-1">
@@ -32,4 +38,4 @@ const Contact = ({ contact, onDelete }) => {
     );
 };
 
-export default Contact;
+export default ContactCard;

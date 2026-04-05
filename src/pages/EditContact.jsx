@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import useGlobalReducer from "../hooks/useGlobalReducer";
+import { BASE_URL, AGENDA_SLUG } from "../store";
 
 export const EditContact = () => {
   const { store, dispatch } = useGlobalReducer();
@@ -14,19 +15,21 @@ export const EditContact = () => {
     email: contact?.email || "",
     phone: contact?.phone || "",
     address: contact?.address || "",
-    photo: contact?.photo || ""
   });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch({
-      type: "edit_contact",
-      payload: { ...formData, id: contact.id }
+    const res = await fetch(`${BASE_URL}/contact/agendas/${AGENDA_SLUG}/contacts/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
     });
+    const updated = await res.json();
+    dispatch({ type: "edit_contact", payload: updated });
     navigate("/");
   };
 
@@ -39,7 +42,7 @@ export const EditContact = () => {
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label>Full Name</label>
-          <input className="form-control" name="name" value={formData.name} onChange={handleChange} />
+          <input required className="form-control" name="name" value={formData.name} onChange={handleChange} />
         </div>
 
         <div className="mb-3">
@@ -57,7 +60,7 @@ export const EditContact = () => {
           <input className="form-control" name="address" value={formData.address} onChange={handleChange} />
         </div>
 
-        <button type="submit" className="btn btn-primary w-100">save</button>
+        <button type="submit" className="btn btn-primary w-100">Save</button>
       </form>
 
       <Link to="/">or get back to contacts</Link>
